@@ -70,7 +70,22 @@ app.post('/emit', (req, res) => {
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => res.json({ status: 'ok', connections: io.engine.clientsCount }));
 
+// ── Keep-alive ping (prevents Render free tier from sleeping) ─────────────────
+// Render spins down after 15 min of inactivity — ping every 14 min to stay awake.
+// RENDER_EXTERNAL_URL is set automatically by Render in production.
+const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+const PING_INTERVAL = 14 * 60 * 1000; // 14 minutes
+
+setInterval(() => {
+  http.get(`${SELF_URL}/health`, (res) => {
+    console.log(`[keep-alive] ping → ${res.statusCode}`);
+  }).on('error', (err) => {
+    console.warn('[keep-alive] ping failed:', err.message);
+  });
+}, PING_INTERVAL);
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 server.listen(PORT, () => {
   console.log(`[socket-server] running on http://localhost:${PORT}`);
+  console.log(`[keep-alive] pinging ${SELF_URL}/health every 14 minutes`);
 });
