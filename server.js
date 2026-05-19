@@ -1,13 +1,13 @@
 require('dotenv').config();
 const express = require('express');
-const http    = require('http');
-const cors    = require('cors');
+const http = require('http');
+const cors = require('cors');
 const { Server } = require('socket.io');
 
-const PORT         = process.env.PORT || 3001;
-const EMIT_SECRET  = process.env.EMIT_SECRET || 'pratham-internal-secret';
+const PORT = process.env.PORT || 3001;
+const EMIT_SECRET = process.env.EMIT_SECRET || 'pratham-internal-secret';
 
-const app    = express();
+const app = express();
 const server = http.createServer(app);
 
 // ── Middleware ────────────────────────────────────────────────────────────────
